@@ -1,11 +1,13 @@
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const menus = {
-  taste: [['From the garden', 'Roasted seasonal vegetables, herb oil, toasted almonds.', 'EARTH · SEASON · SIMPLICITY'], ['A Mediterranean beginning', 'Burrata, ripe tomatoes, basil and extra virgin olive oil.', 'FRESH · BRIGHT · SHARED'], ['From the sea', 'Seared fish, silky cauliflower and a touch of lemon.', 'COAST · FIRE · CITRUS']],
-  wine: [['A glass of character', 'A full-bodied red to linger over as the evening unfolds.', 'RED · DEEP · EXPRESSIVE'], ['A lighter conversation', 'A crisp white with citrus notes and a Mediterranean spirit.', 'WHITE · FRESH · MINERAL'], ['A sparkling beginning', 'Fine bubbles for an evening worth celebrating.', 'SPARKLING · BRIGHT · JOYFUL']],
-  sweet: [['The chocolate finale', 'Dark chocolate, olive oil and a delicate pinch of sea salt.', 'RICH · SILKY · UNEXPECTED'], ['A citrus interlude', 'Lemon cream, toasted crumble and seasonal fruit.', 'ZEST · TEXTURE · LIGHT'], ['One more moment', 'A little coffee. A little something sweet. No need to rush.', 'WARM · SLOW · SIMPLE']]
+  taste: [['Argentine Angus sirloin', 'Selected Angus beef, finished on the grill.', 'FIRE · PRIME CUT'], ['French rack of lamb', 'Lamb served with a delicate vegetable accompaniment.', 'CHARACTER · BALANCE'], ['Slow-cooked beef cheeks', 'Aged wine and creamy potato parmentier.', 'TIME · DEPTH']],
+  wine: [['Salmon', 'Agave, dill and lemon, with potato mille-feuille and Mahón cream.', 'CITRUS · SEA'], ['Cod, two ways', 'Trinxat, Iberian ham, figs and almonds.', 'MEDITERRANEAN ROOTS'], ['Tuna tataki', 'Sesame, Japanese vinaigrette, snow peas and pak choi.', 'FRESH · PRECISE']],
+  sweet: [['Honey & mató', 'Catalan fresh cheese, thyme, lemon and truffle honey.', 'CATALAN MEMORY'], ['Cheesecake cannoli', 'A delicate cheesecake filling with red berries.', 'CREAMY · BRIGHT'], ['Chocolates', 'Chocolate explored through contrasting textures.', 'A RICH FINALE']]
 };
+const menuPhotos = {taste:['arcano-steak.jpg', 'Arcano’s plated sirloin'], wine:['arcano-detail.jpg','The dining room at Arcano'], sweet:['arcano-room.jpg','The intimate dining room at Arcano']};
 function renderMenu(key) {
   const panel = document.querySelector('#menu-panel');
+  const [image, alt] = menuPhotos[key]; const photo = document.querySelector('#menu-photo'); photo.src = `assets/${image}`; photo.alt = alt;
   panel.replaceChildren(...menus[key].map(([title, copy, note]) => {
     const row = document.createElement('article'); row.className = 'menu-row';
     const h = document.createElement('h3'); h.textContent = title;
@@ -34,6 +36,8 @@ document.querySelectorAll('[role=tablist]').forEach(list => {
       document.querySelector('#mood-label').textContent = label;
       document.documentElement.style.setProperty('--mood',color);
       window.dispatchEvent(new CustomEvent('arcano-mood',{detail:color}));
+      const photos = {intimate:['arcano-room.jpg','Arcano’s intimate stone dining room'],gather:['arcano-interior.jpg','Arcano’s original arches and dining tables'],late:['arcano-detail.jpg','Warm lighting beneath Arcano’s stone arches']};
+      const photo = document.querySelector('#space-photo'); photo.src = `assets/${photos[tab.dataset.mood][0]}`; photo.alt = photos[tab.dataset.mood][1];
     }
   }
   tabs.forEach((tab,index) => {
@@ -62,7 +66,9 @@ booking.addEventListener('close', () => bookingTrigger?.focus());
 document.querySelector('#booking-form').addEventListener('submit',e => {
   e.preventDefault();
   const formatted = new Date(`${date.value}T12:00:00`).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  document.querySelector('#booking-status').textContent = `Your preview: ${document.querySelector('#booking-guests').value}, ${formatted} at ${document.querySelector('#booking-time').value}. This is a demo — no reservation has been made.`;
+  const status = document.querySelector('#booking-status');
+  status.textContent = `Your preference: ${document.querySelector('#booking-guests').value}, ${formatted} at ${document.querySelector('#booking-time').value}. Confirm availability with Arcano. `;
+  const link = document.createElement('a'); link.href = 'https://www.arcanobarcelona.com/en/reservas'; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Open official reservations'; link.className = 'booking-link'; status.append(link);
 });
 if(window.gsap && window.ScrollTrigger && !reducedMotion) {
   gsap.registerPlugin(ScrollTrigger);

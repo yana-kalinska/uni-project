@@ -50,11 +50,15 @@ if(renderer) {
     const t=ms*.001;const dt=Math.min((ms-last)*.001,.05);last=ms;
     scroll += (window.scrollY-scroll)*.06;
     const mobile=innerWidth<800;
+    const stage = document.querySelector('#wine').getBoundingClientRect();
+    const visible = Math.max(0,Math.min(1,(innerHeight-stage.top)/200,(stage.bottom)/200));
+    host.style.opacity = visible;
+    const center = stage.top + stage.height / 2;
     const progress=Math.min(scroll/Math.max(innerHeight,1),4);
-    const targetX=mobile?.52:camera.aspect*1.05;
+    const targetX=mobile?.40:camera.aspect*1.05;
     group.position.x=targetX + Math.sin(progress*1.3)*.25;
-    group.position.y=(mobile?-1.15:0)+Math.sin(t*.7)*.06;
-    const scale=mobile?.43:1.03;group.scale.setScalar(scale);
+    group.position.y=(.5-center/innerHeight)*5.1+(mobile?-.75:0)+Math.sin(t*.7)*.06;
+    const scale=mobile?.40:.86;group.scale.setScalar(scale);
     spin*=Math.pow(.13,dt);
     group.rotation.z += ((mobile?.12:-.16)+px*.09+Math.sin(progress)*.16-group.rotation.z)*.04;
     group.rotation.y += ((px*.3+progress*.5+spin)-group.rotation.y)*.04;
@@ -68,6 +72,7 @@ if(renderer) {
   document.querySelector('#swirl').addEventListener('click',()=>{spin+=Math.PI*2;if(reduce.matches) render(0);});
   window.addEventListener('arcano-mood',e=>{rim.color.set(e.detail);if(reduce.matches)render(0);});
   window.addEventListener('resize',resize);
+  window.addEventListener('scroll',()=>{if(reduce.matches) render(0);},{passive:true});
   function restart(){cancelAnimationFrame(frame);last=performance.now();render(last);}
   document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(frame);else restart();});
   reduce.addEventListener('change',restart);
