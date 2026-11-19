@@ -35,7 +35,6 @@ document.querySelectorAll('[role=tablist]').forEach(list => {
       document.querySelector('#mood-copy').textContent = copy;
       document.querySelector('#mood-label').textContent = label;
       document.documentElement.style.setProperty('--mood',color);
-      window.dispatchEvent(new CustomEvent('arcano-mood',{detail:color}));
       const photos = {intimate:['arcano-interior.jpg','Arcano’s original arches and dining tables'],gather:['arcano-room.jpg','Arcano’s intimate stone dining room'],late:['arcano-detail.jpg','Warm lighting beneath Arcano’s stone arches']};
       const photo = document.querySelector('#space-photo'); if(window.gsap && !reducedMotion) gsap.fromTo(photo,{opacity:.3,scale:1.08},{opacity:1,scale:1,duration:.8,ease:'power2.out'}); photo.src = `assets/${photos[tab.dataset.mood][0]}`; photo.alt = photos[tab.dataset.mood][1];
     }
@@ -105,6 +104,8 @@ if(window.gsap && window.ScrollTrigger && !reducedMotion) {
   gsap.from('.floating-photo',{scale:.8,opacity:0,duration:1.3,delay:.3,stagger:.15,ease:'power3.out'});
   gsap.to('.architecture',{y:-150,rotation:-22,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
   gsap.to('.plate',{y:100,rotation:26,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+  gsap.to('.engraved-portal',{y:-100,rotation:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+  gsap.to('.wine-print',{rotation:-10,ease:'none',scrollTrigger:{trigger:'.wine-stage',start:'top bottom',end:'bottom top',scrub:1}});
   gsap.to('.hero-title',{y:100,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
   gsap.from('.manifesto h2',{scale:.86,opacity:.3,scrollTrigger:{trigger:'.manifesto',start:'top 85%',end:'center center',scrub:1}});
   gsap.to('.theatre-word',{xPercent:10,ease:'none',scrollTrigger:{trigger:'.space-theatre',start:'top bottom',end:'bottom top',scrub:1}});
