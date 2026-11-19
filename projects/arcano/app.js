@@ -19,8 +19,8 @@ function renderMenu(key) {
 }
 renderMenu('taste');
 const moods = {
-  intimate: ['For just the two of you.', 'Low light, a shared bottle, and nowhere else you need to be.', 'SOFT LIGHT · SLOW EVENINGS', '#7c2941'],
-  gather: ['Good company changes everything.', 'A long conversation, plates to share, and space for another story.', 'WARM LIGHT · SHARED MOMENTS', '#bd824a'],
+  intimate: ['Beneath the arches.', 'Original stone, warm light, and a passage into another Barcelona.', 'STONE · LIGHT · HISTORY', '#7c2941'],
+  gather: ['A room for conversation.', 'Intimate tables, textured walls, and time to settle into the evening.', 'CLOSER · WARMER · TOGETHER', '#bd824a'],
   late: ['Let the night surprise you.', 'Deeper shadows. A richer red. Just one more moment at the table.', 'DEEP RED · AFTER HOURS', '#8c446d']
 };
 document.querySelectorAll('[role=tablist]').forEach(list => {
@@ -36,8 +36,8 @@ document.querySelectorAll('[role=tablist]').forEach(list => {
       document.querySelector('#mood-label').textContent = label;
       document.documentElement.style.setProperty('--mood',color);
       window.dispatchEvent(new CustomEvent('arcano-mood',{detail:color}));
-      const photos = {intimate:['arcano-room.jpg','Arcano’s intimate stone dining room'],gather:['arcano-interior.jpg','Arcano’s original arches and dining tables'],late:['arcano-detail.jpg','Warm lighting beneath Arcano’s stone arches']};
-      const photo = document.querySelector('#space-photo'); photo.src = `assets/${photos[tab.dataset.mood][0]}`; photo.alt = photos[tab.dataset.mood][1];
+      const photos = {intimate:['arcano-interior.jpg','Arcano’s original arches and dining tables'],gather:['arcano-room.jpg','Arcano’s intimate stone dining room'],late:['arcano-detail.jpg','Warm lighting beneath Arcano’s stone arches']};
+      const photo = document.querySelector('#space-photo'); if(window.gsap && !reducedMotion) gsap.fromTo(photo,{opacity:.3,scale:1.08},{opacity:1,scale:1,duration:.8,ease:'power2.out'}); photo.src = `assets/${photos[tab.dataset.mood][0]}`; photo.alt = photos[tab.dataset.mood][1];
     }
   }
   tabs.forEach((tab,index) => {
@@ -58,7 +58,7 @@ const date = document.querySelector('#booking-date');
 const today = new Date();
 date.min = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 document.querySelectorAll('[data-reserve]').forEach(button => button.addEventListener('click', () => {
-  bookingTrigger = button; document.querySelector('#booking-status').textContent = ''; booking.showModal();
+  closeNavigation(); bookingTrigger = button; document.querySelector('#booking-status').textContent = ''; booking.showModal();
 }));
 document.querySelector('.close-dialog').addEventListener('click', () => booking.close());
 booking.addEventListener('click', e => {if(e.target === booking) {const r = booking.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) booking.close();}});
@@ -70,9 +70,45 @@ document.querySelector('#booking-form').addEventListener('submit',e => {
   status.textContent = `Your preference: ${document.querySelector('#booking-guests').value}, ${formatted} at ${document.querySelector('#booking-time').value}. Confirm availability with Arcano. `;
   const link = document.createElement('a'); link.href = 'https://www.arcanobarcelona.com/en/reservas'; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Open official reservations'; link.className = 'booking-link'; status.append(link);
 });
+
+const toggle = document.querySelector('#nav-toggle');
+const overlay = document.querySelector('#nav-overlay');
+function closeNavigation(){
+  if(!overlay) return;
+  overlay.hidden = true;
+  toggle.setAttribute('aria-expanded','false'); toggle.setAttribute('aria-label','Open navigation');
+  document.body.classList.remove('nav-open');
+  document.querySelector('main').inert = false; document.querySelector('footer').inert = false;
+}
+toggle.addEventListener('click',()=>{
+  if(!overlay.hidden){closeNavigation();return;}
+  overlay.hidden=false; toggle.setAttribute('aria-expanded','true');toggle.setAttribute('aria-label','Close navigation');
+  document.body.classList.add('nav-open');document.querySelector('main').inert=true;document.querySelector('footer').inert=true;
+  if(window.gsap&&!reducedMotion)gsap.fromTo(overlay.querySelectorAll('nav a'),{y:30,opacity:0},{y:0,opacity:1,duration:.5,stagger:.06});
+  overlay.querySelector('a').focus();
+});
+overlay.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeNavigation));
+document.addEventListener('keydown',e=>{
+  if(overlay.hidden) return;
+  if(e.key==='Escape'){closeNavigation();toggle.focus();}
+  if(e.key==='Tab'){
+    const focusables=[...document.querySelectorAll('.site-header a,.site-header button,#nav-overlay a')];
+    const first=focusables[0],last=focusables.at(-1);
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  }
+});
 if(window.gsap && window.ScrollTrigger && !reducedMotion) {
   gsap.registerPlugin(ScrollTrigger);
-  gsap.from('.hero-copy > *',{y:35,opacity:0,duration:1.2,stagger:.14,ease:'power3.out'});
-  gsap.utils.toArray('.reveal').forEach(el => gsap.from(el,{y:40,opacity:0,duration:1,scrollTrigger:{trigger:el,start:'top 92%'},ease:'power2.out'}));
-  gsap.to('.image-arch img',{scale:1.1,ease:'none',scrollTrigger:{trigger:'.image-arch',start:'top bottom',end:'bottom top',scrub:1}});
+  gsap.from('.hero-title',{opacity:0,duration:1.5,ease:'power3.out'});
+  gsap.from('.hero-intro,.hero-meta',{y:25,opacity:0,duration:1,delay:.3,stagger:.1});
+  gsap.from('.floating-photo',{scale:.8,opacity:0,duration:1.3,delay:.3,stagger:.15,ease:'power3.out'});
+  gsap.to('.architecture',{y:-150,rotation:-22,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+  gsap.to('.plate',{y:100,rotation:26,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+  gsap.to('.hero-title',{y:100,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+  gsap.from('.manifesto h2',{scale:.86,opacity:.3,scrollTrigger:{trigger:'.manifesto',start:'top 85%',end:'center center',scrub:1}});
+  gsap.to('.theatre-word',{xPercent:10,ease:'none',scrollTrigger:{trigger:'.space-theatre',start:'top bottom',end:'bottom top',scrub:1}});
+  gsap.from('.space-photo-wrap',{rotation:3,scale:.85,scrollTrigger:{trigger:'.space-theatre',start:'top 85%',end:'center center',scrub:1}});
+  gsap.from('.visit-title h2',{x:-55,opacity:.4,scrollTrigger:{trigger:'.visit',start:'top 85%',end:'center center',scrub:1}});
+  gsap.to('.food-interlude>img',{scale:1.15,ease:'none',scrollTrigger:{trigger:'.food-interlude',start:'top bottom',end:'bottom top',scrub:1}});
 }

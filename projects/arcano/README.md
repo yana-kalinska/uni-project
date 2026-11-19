@@ -11,3 +11,7 @@ Open `index.html` through the repository's local HTTP server. No build step or n
 - Pointer and scroll influence the glass; the Swirl button is keyboard accessible. Motion respects reduced-motion preferences; the page remains navigable without WebGL.
 
 Preview: `python3 -m http.server 8000 --bind 127.0.0.1`, then visit `/projects/arcano/`.
+
+## Visual direction
+
+The revised structure takes direction from https://www.lidiaeamato.com/: oversized typography, floating object composition, contrasting editorial chapters and scroll-linked transforms. It uses Arcano’s own assets; no imagery or code was copied from the reference. Includes a full-screen keyboard-accessible navigation, room explorer and typographic menu tabs.

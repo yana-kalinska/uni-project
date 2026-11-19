@@ -7,7 +7,7 @@ try {
   renderer = new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
 } catch {
   hint.textContent = 'A little mystery. A moment to savour.';
-  document.querySelector('#swirl').hidden = true;
+  document.querySelector('#swirl').hidden = true; document.querySelector('#hero-swirl').hidden = true;
 }
 if(renderer) {
   renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
@@ -51,14 +51,18 @@ if(renderer) {
     scroll += (window.scrollY-scroll)*.06;
     const mobile=innerWidth<800;
     const stage = document.querySelector('#wine').getBoundingClientRect();
-    const visible = Math.max(0,Math.min(1,(innerHeight-stage.top)/200,(stage.bottom)/200));
-    host.style.opacity = visible;
-    const center = stage.top + stage.height / 2;
+    const hero = document.querySelector('#home').getBoundingClientRect();
+    const heroVisible=Math.max(0,Math.min(1,hero.bottom/300));
+    const wineVisible=Math.max(0,Math.min(1,(innerHeight-stage.top)/200,stage.bottom/200));
+    host.style.opacity=Math.max(heroVisible,wineVisible);
+    const inHero = hero.bottom>0;
     const progress=Math.min(scroll/Math.max(innerHeight,1),4);
-    const targetX=mobile?.40:camera.aspect*1.05;
-    group.position.x=targetX + Math.sin(progress*1.3)*.25;
-    group.position.y=(.5-center/innerHeight)*5.1+(mobile?-.75:0)+Math.sin(t*.7)*.06;
-    const scale=mobile?.40:.86;group.scale.setScalar(scale);
+    const targetX=inHero ? 0 : (mobile?.35:camera.aspect*.95);
+    group.position.x += (targetX-group.position.x)*.045;
+    const center=inHero? innerHeight*.51 : stage.top+stage.height/2;
+    group.position.y=(.5-center/innerHeight)*5.1+(mobile&&!inHero?-.75:0)+Math.sin(t*.7)*.04;
+    const scale=inHero?(mobile?.57:.95):(mobile?.42:.95);
+    group.scale.setScalar(scale);
     spin*=Math.pow(.13,dt);
     group.rotation.z += ((mobile?.12:-.16)+px*.09+Math.sin(progress)*.16-group.rotation.z)*.04;
     group.rotation.y += ((px*.3+progress*.5+spin)-group.rotation.y)*.04;
@@ -69,7 +73,7 @@ if(renderer) {
     if(!reduce.matches&&!document.hidden) frame=requestAnimationFrame(render);
   }
   window.addEventListener('pointermove',e=>{px=e.clientX/innerWidth-.5;py=e.clientY/innerHeight-.5;},{passive:true});
-  document.querySelector('#swirl').addEventListener('click',()=>{spin+=Math.PI*2;if(reduce.matches) render(0);});
+  document.querySelectorAll('#swirl,#hero-swirl').forEach(button=>button.addEventListener('click',()=>{spin+=Math.PI*2;if(reduce.matches)render(0);}));
   window.addEventListener('arcano-mood',e=>{rim.color.set(e.detail);if(reduce.matches)render(0);});
   window.addEventListener('resize',resize);
   window.addEventListener('scroll',()=>{if(reduce.matches) render(0);},{passive:true});
